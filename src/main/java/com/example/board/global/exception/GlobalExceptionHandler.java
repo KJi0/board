@@ -2,6 +2,7 @@ package com.example.board.global.exception;
 
 import com.example.board.global.response.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static com.example.board.global.response.ApiResponse.fail;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -37,7 +39,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception e) {
+        // 🔥 개선: 예상 못 한 예외는 반드시 로그
+        log.error("Unexpected server error", e);
+
         return ResponseEntity.status(ErrorCode.INTERNAL_ERROR.getStatus())
-                .body(fail(ErrorCode.INTERNAL_ERROR.getCode(), ErrorCode.INTERNAL_ERROR.getMessage()));
+                .body(fail(
+                        ErrorCode.INTERNAL_ERROR.getCode(),
+                        ErrorCode.INTERNAL_ERROR.getMessage()
+                ));
     }
 }
